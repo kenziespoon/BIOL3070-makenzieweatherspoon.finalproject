@@ -1,7 +1,7 @@
 Warm-up mini-Report: Mosquito Blood Hosts in Salt Lake City, Utah
 ================
 Makenzie Weatherspoon
-2025-10-09
+2025-11-04
 
 - [ABSTRACT](#abstract)
 - [BACKGROUND](#background)
@@ -25,12 +25,12 @@ Makenzie Weatherspoon
 West Nile Virus (WNV) is a mosquito-borne disease that infects a wide
 range of hosts, including humans and birds. This study investigated the
 relationship between mosquito blood meal sources and the presence of WNV
-in Salt Lake City, Utah. Using CO₂-baited traps, mosquitoes were
-collected and analyzed through PCR and DNA sequencing to identify their
-vertebrate blood meal hosts. Data were visualized in R to compare host
-species composition at sites with and without WNV detections.
-Preliminary results suggest that common urban bird species, such as the
-house finch, may play an important role in local WNV amplification.
+in Salt Lake City, Utah. Using CO2 traps, mosquitoes were collected and
+analyzed through PCR and DNA sequencing to identify their vertebrate
+blood meal hosts. Data were visualized in R to compare host species
+composition at sites with and without WNV detection. Preliminary results
+suggest that common urban bird species, such as the house finch, may
+play an important role in local WNV amplification.
 
 # BACKGROUND
 
@@ -322,7 +322,7 @@ strategies.
     Dis. 2003 Mar;9(3):311-22. <https://doi.org/10.3201/eid0903.020628>
 
 2.  ChatGPT. OpenAI, version Jan 2025. Used as a reference for functions
-    such as plot() and to correct syntax errors. Accessed 2025-10-09.
+    such as plot() and to correct syntax errors. Accessed 2025-11-04.
 
 3.  Sejvar JJ. West nile virus: an historical overview. Ochsner J. 2003
     Summer;5(3):6-10. PMID: 21765761; PMCID: PMC3111838.
