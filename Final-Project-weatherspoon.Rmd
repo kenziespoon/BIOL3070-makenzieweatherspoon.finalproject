@@ -10,6 +10,11 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+```{r load-libraries}
+
+library(ggplot2)
+
+```
 
 # ABSTRACT
 Cancer develops when normal cells begin to grow and divide in an unregulated way, often due to mutations that change how genes are expressed. Studying gene expression differences between normal and cancerous tissues can help researchers better understand which genes may contribute to tumor development. This project used the GSE15852 dataset, which contains 86 breast tissue samples collected from Malaysian patients, to compare gene expression patterns between 43 normal and 43 cancerous breast tissue samples. The main focus of this analysis was the expression of CD24, a cell surface protein commonly found in immune and epithelial cells and previously linked to cancer progression. Using R and the limma package, gene expression values were processed, normalized, and statistically tested to identify differences between the two tissue types. The results of this computational analysis showed clear differences in gene expression between normal and cancerous tissues, including changes in CD24 expression. These findings support further exploration into the role of CD24 in breast cancer biology and demonstrate how publicly available datasets can be used to investigate important questions in cancer research.
