@@ -2,7 +2,7 @@ Computational Analysis of Gene Expression in Normal and Cancerous Breast
 Tissues
 ================
 Makenzie Weatherspoon
-2025-12-02
+2025-12-03
 
 - [ABSTRACT](#abstract)
 - [BACKGROUND](#background)
@@ -12,6 +12,7 @@ Makenzie Weatherspoon
   - [PREDICTION](#prediction)
 - [METHODS](#methods)
 - [ANALYSIS](#analysis)
+- [RESULTS](#results)
 - [DISCUSSION](#discussion)
 - [CONCLUSION](#conclusion)
 - [REFERENCES](#references)
@@ -334,15 +335,18 @@ legend("bottomleft",
 ```
 
 ![](Final-Project-weatherspoon_files/figure-gfm/pressure-2.png)<!-- -->
-\# RESULTS The p-value histogram embedded in the code shows that on
-average, there is decreased regulation of CD24 molecules resulting in
-higher levels of expression in cancerous tissue. However, it also
-highlighted that there were some exeptions to this pattern. Further
-analysis was needed to better understand the causes of cancer in each
-sample. The volcano plot highlights each of the 12,413 genes identified
-in the GSE15852 data set. There are over regulation and under regulation
-of different genes which in turn supports the idea that cancer biology
-is complex and often differs case by case.
+
+# RESULTS
+
+The p-value histogram embedded in the code shows that on average, there
+is decreased regulation of CD24 molecules resulting in higher levels of
+expression in cancerous tissue. However, it also highlighted that there
+were some exeptions to this pattern. Further analysis was needed to
+better understand the causes of cancer in each sample. The volcano plot
+highlights each of the 12,413 genes identified in the GSE15852 data set.
+There are over regulation and under regulation of different genes which
+in turn supports the idea that cancer biology is complex and often
+differs case by case.
 
 # DISCUSSION
 

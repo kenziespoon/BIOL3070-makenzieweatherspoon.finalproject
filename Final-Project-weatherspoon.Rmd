@@ -154,6 +154,7 @@ legend("bottomleft",
        bty = "n")
 
 ```
+
 # RESULTS
 The p-value histogram embedded in the code shows that on average, there is decreased regulation of CD24 molecules resulting in higher levels of expression in cancerous tissue. However, it also highlighted that there were some exeptions to this pattern. Further analysis was needed to better understand the causes of cancer in each sample. The volcano plot highlights each of the 12,413 genes identified in the GSE15852 data set. There are over regulation and under regulation of different genes which in turn supports the idea that cancer biology is complex and often differs case by case. 
 
