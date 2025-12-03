@@ -1,343 +1,427 @@
-Warm-up mini-Report: Mosquito Blood Hosts in Salt Lake City, Utah
+Computational Analysis of Gene Expression in Normal and Cancerous Breast
+Tissues
 ================
 Makenzie Weatherspoon
-2025-11-04
+2025-12-02
 
 - [ABSTRACT](#abstract)
 - [BACKGROUND](#background)
-- [STUDY QUESTION and HYPOTHESIS](#study-question-and-hypothesis)
-  - [Questions](#questions)
-  - [Hypothesis](#hypothesis)
-  - [Prediction](#prediction)
+- [STUDY QUESTION AND HYPOTHESIS](#study-question-and-hypothesis)
+  - [QUESTIONS](#questions)
+  - [HYPOTHESIS](#hypothesis)
+  - [PREDICTION](#prediction)
 - [METHODS](#methods)
-  - [Fill in first analysis](#fill-in-first-analysis)
-  - [Fill in second analysis/plot](#fill-in-second-analysisplot)
+- [ANALYSIS](#analysis)
 - [DISCUSSION](#discussion)
-  - [Interpretation - fill in
-    analysis](#interpretation---fill-in-analysis)
-  - [Interpretation - fill in
-    analysis/plot](#interpretation---fill-in-analysisplot)
 - [CONCLUSION](#conclusion)
 - [REFERENCES](#references)
 
+``` r
+library(ggplot2)
+```
+
 # ABSTRACT
 
-West Nile Virus (WNV) is a mosquito-borne disease that infects a wide
-range of hosts, including humans and birds. This study investigated the
-relationship between mosquito blood meal sources and the presence of WNV
-in Salt Lake City, Utah. Using CO2 traps, mosquitoes were collected and
-analyzed through PCR and DNA sequencing to identify their vertebrate
-blood meal hosts. Data were visualized in R to compare host species
-composition at sites with and without WNV detection. Preliminary results
-suggest that common urban bird species, such as the house finch, may
-play an important role in local WNV amplification.
+Cancer develops when normal cells begin to grow and divide in an
+unregulated way, often due to mutations that change how genes are
+expressed. Studying gene expression differences between normal and
+cancerous tissues can help researchers better understand which genes may
+contribute to tumor development. This project used the GSE15852 dataset,
+which contains 86 breast tissue samples collected from Malaysian
+patients, to compare gene expression patterns between 43 normal and 43
+cancerous breast tissue samples. The main focus of this analysis was the
+expression of CD24, a cell surface protein commonly found in immune and
+epithelial cells and previously linked to cancer progression. Using R
+and the limma package, gene expression values were processed,
+normalized, and statistically tested to identify differences between the
+two tissue types. The results of this computational analysis showed
+clear differences in gene expression between normal and cancerous
+tissues, including changes in CD24 expression. These findings support
+further exploration into the role of CD24 in breast cancer biology and
+demonstrate how publicly available datasets can be used to investigate
+important questions in cancer research.
 
 # BACKGROUND
 
-West Nile Virus (WNV) has been around the world since the early 1900s
-and was suspected to have traveled to the United States in 1999 (Sejvar
-2003). WNV is primarily spread to different hosts through mosquitoes.
-WNV can infect a multitude of organisms including humans, horses, and up
-to 25 different mammalian species (Cornell Wildlife Health Lab 2016). In
-humans, symptoms of WNV appear as having a fever, headache, body aches,
-diarrhea, sore throat, nausea, and or vomiting (Cleaveland Clinic 2025).
-The CDC reported over 160 human cases in the United States to WNV in the
-year 2024 (CDC 2025). However, WNV primarily affects birds as it is seen
-in over 300 species (Hofmeister 2025). Studying the levels of viremia,
-the presence of a virus in the bloodstream, within bird populations
-across specific geographic regions is a common method used to study
-disease transmission and will serve as the focus of this research.
+Cancer occurs when there is unregulated cell proliferation in an
+otherwise healthy cell that often spreads to other areas of the body
+(National Cancer Institute, 2021). This unregulated growth occurs as a
+result of mutations in genetic material that encodes for protein
+synthesis, or lack thereof. There are upwards of 20,000 genes in the
+human genome (American Psychological Association, 2024) each of which
+are subject to mutations which may or may not result in a cell becoming
+cancerous. Research surrounding gene expression levels has allowed
+scientists to better understand the nature of cancer and mutations. For
+example, tumor protein 53 gene (TP53) is a gene that encodes for the p53
+gene. P53 is so widely recognized as being under expressed in cancerous
+tissues that it has earned the name of “Guardian of the Genome”. There
+are a plethora of genes that could be analysed, however, this
+computational analysis will use the GSE15852 data set to dissect gene
+expression of Cluster of Differentiation 24 (CD24). CD24 is a cell
+surface protein that is commonly expressed by immune, epithelial,
+neural, and muscle cells (Panagiotou, 2022).
 
-``` r
-# Manually transcribe duration (mean, lo, hi) from the last table column
-duration <- data.frame(
-  Bird = c("Canada Goose","Mallard", 
-           "American Kestrel","Northern Bobwhite",
-           "Japanese Quail","Ring-necked Pheasant",
-           "American Coot","Killdeer",
-           "Ring-billed Gull","Mourning Dove",
-           "Rock Dove","Monk Parakeet",
-           "Budgerigar","Great Horned Owl",
-           "Northern Flicker","Blue Jay",
-           "Black-billed Magpie","American Crow",
-           "Fish Crow","American Robin",
-           "European Starling","Red-winged Blackbird",
-           "Common Grackle","House Finch","House Sparrow"),
-  mean = c(4.0,4.0,4.5,4.0,1.3,3.7,4.0,4.5,5.5,3.7,3.2,2.7,1.7,6.0,4.0,
-           4.0,5.0,3.8,5.0,4.5,3.2,3.0,3.3,6.0,4.5),
-  lo   = c(3,4,4,3,0,3,4,4,4,3,3,1,0,6,3,
-           3,5,3,4,4,3,3,3,5,2),
-  hi   = c(5,4,5,5,4,4,4,5,7,4,4,4,4,6,5,
-           5,5,5,7,5,4,3,4,7,6)
-)
+# STUDY QUESTION AND HYPOTHESIS
 
-# Choose some colors
-cols <- c(rainbow(30)[c(10:29,1:5)])  # rainbow colors
+## QUESTIONS
 
-# horizontal barplot
-par(mar=c(5,12,2,2))  # wider left margin for names
-bp <- barplot(duration$mean, horiz=TRUE, names.arg=duration$Bird,
-              las=1, col=cols, xlab="Days of detectable viremia", xlim=c(0,7))
+Does the expression of genes that encode for CD24 molecules (C24 genes)
+vary in cancerous breast tissue compared to normal breast tissue?
 
-# add error bars
-arrows(duration$lo, bp, duration$hi, bp,
-       angle=90, code=3, length=0.05, col="black", xpd=TRUE)
-```
+## HYPOTHESIS
 
-<img src="templateReport_files/figure-gfm/viremia-1.png" style="display: block; margin: auto auto auto 0;" />
+The expression of CD24 will vary between the two tissue samples.
 
-# STUDY QUESTION and HYPOTHESIS
+## PREDICTION
 
-## Questions
-
-Does the number of West Nile Virus in common local bird species directly
-relate to the number of human West Nile Virus? If so, then which bird
-species has the highest impact on the levels of WNV in Salt Lake City,
-Utah?
-
-## Hypothesis
-
-If increased cases of WNV in birds causes increased cases of human WNV,
-then it will be likely due to a common species to residential areas
-around Salt Lake City, like House Finches.
-
-## Prediction
-
-If house finches contribute to WNV transmission, then areas with greater
-mosquito feeding on finches will correspond to increased WNV prevalence
-in local mosquito populations.
+CD24 genes will be expressed at a higher rate in cancerous tissues than
+in normal tissue samples on average.
 
 # METHODS
 
-Teams working with Dr. Norah Saarman used mosquito collection
-techniques, such as CO2 collection chambers, to collect female
-mosquitoes around Salt Lake City. DNA from each mosquito individually
-was extracted to visualize the DNA from the previous blood meal.
-Afterwards, Polymerase Chain Reaction (PCR) and DNA sequencing
-techniques were used to determine the DNA sequence of the last blood
-meal. The species of the blood meal was then determined using the BLAST
-database and DNA sequences collected.
+This computational analysis utilized the GSE15852 dataset obtained from
+the Gene Expression Omnibis (GEO) database. This data set includes
+tissue gene expression from 86 tissue samples. This includes 43 normal
+(control/healthy) breast tissue samples and 43 matched breast cancer
+tissue samples. A pairwise comparison between the healthy and malignant
+tissues was made to gain a better understanding of gene expression. All
+analyses were conducted in Posit Cloud using R version 4.3.3 where both
+Bioconductor and GEOquary packages were used to retrieve the expression
+matrix and platform annotation of the data set. A Log2 transformation
+was applied to stabilize the variance across expression levels.
 
-Data visualization and analysis were conducted in R using an R Markdown
-workflow to promote reproducibility. The dataset
-(bloodmeal_plusWNV_for_BIOL3070.csv) was imported and processed to
-summarize host species counts at sites with and without WNV viremia
-detection. The R code aggregated counts for each host species, compared
-host distributions between WNV-positive and WNV-negative locations, and
-produced horizontal bar plots to visually represent these patterns.
-Custom color palettes and axis adjustments were implemented for clarity
-and consistency across plots. This analytical approach allowed us to
-explore potential associations between mosquito blood meal preferences
-and the presence of WNV in Salt Lake City, Utah.
+Samples in the data set were assigned to either “normal” or “tumor”
+groups based on the metadata provided by the GEO Series Matrix file. A
+design matrix representing the two groups was generated wising the limma
+pipeline. This pipeline fits linear models to each gene allowing the
+assessment of systemic differences between the two groups. In order to
+account for false-positive findings, the Bonferroni multiple test
+correction was used to adjust the P-values. Genes were considered
+significantly differently expressed if they met both the adjusted
+p-value threshold and a biologically relevant log2 fold-change.
 
-## Fill in first analysis
+Visualization of this analysis was done using a p-value histogram to
+compare each sample (either cancerous or control) to observe the
+difference in expression level of CD24. In order to further observe
+differences between cancerous and control gene expression, volcano plot
+was used to visualize all the genes in the data set.
 
-Horizontal plots:
+# ANALYSIS
 
 ``` r
-## import counts_matrix: data.frame with column 'loc_positives' (0/1) and host columns 'host_*'
-counts_matrix <- read.csv("./bloodmeal_plusWNV_for_BIOL3070.csv")
-
-## 1) Identify host columns
-host_cols <- grep("^host_", names(counts_matrix), value = TRUE)
-
-if (length(host_cols) == 0) {
-  stop("No columns matching '^host_' were found in counts_matrix.")
-}
-
-## 2) Ensure loc_positives is present and has both levels 0 and 1 where possible
-counts_matrix$loc_positives <- factor(counts_matrix$loc_positives, levels = c(0, 1))
-
-## 3) Aggregate host counts by loc_positives
-agg <- stats::aggregate(
-  counts_matrix[, host_cols, drop = FALSE],
-  by = list(loc_positives = counts_matrix$loc_positives),
-  FUN = function(x) sum(as.numeric(x), na.rm = TRUE)
-)
-
-## make sure both rows exist; if one is missing, add a zero row
-need_levels <- setdiff(levels(counts_matrix$loc_positives), as.character(agg$loc_positives))
-if (length(need_levels)) {
-  zero_row <- as.list(rep(0, length(host_cols)))
-  names(zero_row) <- host_cols
-  for (lv in need_levels) {
-    agg <- rbind(agg, c(lv, zero_row))
-  }
-  ## restore proper type
-  agg$loc_positives <- factor(agg$loc_positives, levels = c("0","1"))
-  ## coerce numeric host cols (they may have become character after rbind)
-  for (hc in host_cols) agg[[hc]] <- as.numeric(agg[[hc]])
-  agg <- agg[order(agg$loc_positives), , drop = FALSE]
-}
-
-## 4) Decide species order (overall abundance, descending)
-overall <- colSums(agg[, host_cols, drop = FALSE], na.rm = TRUE)
-host_order <- names(sort(overall, decreasing = TRUE))
-species_labels <- rev(sub("^host_", "", host_order))  # nicer labels
-
-## 5) Build count vectors for each panel in the SAME order
-counts0 <- rev(as.numeric(agg[agg$loc_positives == 0, host_order, drop = TRUE]))
-counts1 <- rev(as.numeric(agg[agg$loc_positives == 1, host_order, drop = TRUE]))
-
-## 6) Colors: reuse your existing 'cols' if it exists and is long enough; otherwise generate
-if (exists("cols") && length(cols) >= length(host_order)) {
-  species_colors <- setNames(cols[seq_along(host_order)], species_labels)
-} else {
-  species_colors <- setNames(rainbow(length(host_order) + 10)[seq_along(host_order)], species_labels)
-}
-
-## 7) Shared x-limit for comparability
-xmax <- max(c(counts0, counts1), na.rm = TRUE)
-xmax <- if (is.finite(xmax)) xmax else 1
-xlim_use <- c(0, xmax * 1.08)
-
-## 8) Plot: two horizontal barplots with identical order and colors
-op <- par(mfrow = c(1, 2),
-          mar = c(4, 12, 3, 2),  # big left margin for species names
-          xaxs = "i")           # a bit tighter axis padding
-
-## Panel A: No WNV detected (loc_positives = 0)
-barplot(height = counts0,
-        names.arg = species_labels, 
-        cex.names = .5,
-        cex.axis = .5,
-        col = rev(unname(species_colors[species_labels])),
-        horiz = TRUE,
-        las = 1,
-        xlab = "Bloodmeal counts",
-        main = "Locations WNV (-)",
-        xlim = xlim_use)
-
-## Panel B: WNV detected (loc_positives = 1)
-barplot(height = counts1,
-        names.arg = species_labels, 
-        cex.names = .5,
-        cex.axis = .5,
-        col = rev(unname(species_colors[species_labels])),
-        horiz = TRUE,
-        las = 1,
-        xlab = "Bloodmeal counts",
-        main = "Locations WNV (+)",
-        xlim = xlim_use)
+# Version info: R 4.2.2, Biobase 2.58.0, GEOquery 2.66.0, limma 3.54.0
+################################################################
+#   Data plots for selected GEO samples
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
 ```
 
-<img src="templateReport_files/figure-gfm/horiz-plot-1.png" style="display: block; margin: auto auto auto 0;" />
+    ## Bioconductor version '3.18' is out-of-date; the current release version '3.22'
+    ##   is available with R version '4.5'; see https://bioconductor.org/install
 
 ``` r
-par(op)
-
-## Keep the colors mapping for reuse elsewhere
-host_species_colors <- species_colors
+BiocManager::install("GEOquery")
 ```
 
-## Fill in second analysis/plot
+    ## 'getOption("repos")' replaces Bioconductor standard repositories, see
+    ## 'help("repositories", package = "BiocManager")' for details.
+    ## Replacement repositories:
+    ##     CRAN: http://rspm/default/__linux__/focal/latest
+
+    ## Bioconductor version 3.18 (BiocManager 1.30.26), R 4.3.3 (2024-02-29)
+
+    ## Warning: package(s) not installed when version(s) same as or greater than current; use
+    ##   `force = TRUE` to re-install: 'GEOquery'
+
+    ## Installation paths not writeable, unable to update packages
+    ##   path: /opt/R/4.3.3/lib/R/library
+    ##   packages:
+    ##     boot, class, cluster, codetools, foreign, KernSmooth, lattice, nlme, nnet,
+    ##     rpart, spatial, survival
+
+    ## Old packages: 'BiocManager', 'digest', 'readr', 'reticulate', 'tinytex', 'xml2'
 
 ``` r
-glm1 <- glm(loc_positives ~ host_House_finch, data = counts_matrix, family = binomial)
-summary(glm1)
+library(GEOquery)
+```
+
+    ## Loading required package: Biobase
+
+    ## Loading required package: BiocGenerics
+
+    ## 
+    ## Attaching package: 'BiocGenerics'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     IQR, mad, sd, var, xtabs
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    ##     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    ##     get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
+    ##     match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+    ##     Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
+    ##     table, tapply, union, unique, unsplit, which.max, which.min
+
+    ## Welcome to Bioconductor
+    ## 
+    ##     Vignettes contain introductory material; view with
+    ##     'browseVignettes()'. To cite Bioconductor, see
+    ##     'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+    ## Setting options('download.file.method.GEOquery'='auto')
+
+    ## Setting options('GEOquery.inmemory.gpl'=FALSE)
+
+``` r
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("limma")
+```
+
+    ## 'getOption("repos")' replaces Bioconductor standard repositories, see
+    ## 'help("repositories", package = "BiocManager")' for details.
+    ## Replacement repositories:
+    ##     CRAN: http://rspm/default/__linux__/focal/latest
+
+    ## Bioconductor version 3.18 (BiocManager 1.30.26), R 4.3.3 (2024-02-29)
+
+    ## Warning: package(s) not installed when version(s) same as or greater than current; use
+    ##   `force = TRUE` to re-install: 'limma'
+
+    ## Installation paths not writeable, unable to update packages
+    ##   path: /opt/R/4.3.3/lib/R/library
+    ##   packages:
+    ##     boot, class, cluster, codetools, foreign, KernSmooth, lattice, nlme, nnet,
+    ##     rpart, spatial, survival
+
+    ## Old packages: 'BiocManager', 'digest', 'readr', 'reticulate', 'tinytex', 'xml2'
+
+``` r
+library(limma)
 ```
 
     ## 
-    ## Call:
-    ## glm(formula = loc_positives ~ host_House_finch, family = binomial, 
-    ##     data = counts_matrix)
+    ## Attaching package: 'limma'
+
+    ## The following object is masked from 'package:BiocGenerics':
     ## 
-    ## Coefficients:
-    ##                  Estimate Std. Error z value Pr(>|z|)  
-    ## (Intercept)       -0.1709     0.1053  -1.622   0.1047  
-    ## host_House_finch   0.3468     0.1586   2.187   0.0287 *
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## (Dispersion parameter for binomial family taken to be 1)
-    ## 
-    ##     Null deviance: 546.67  on 394  degrees of freedom
-    ## Residual deviance: 539.69  on 393  degrees of freedom
-    ## AIC: 543.69
-    ## 
-    ## Number of Fisher Scoring iterations: 4
+    ##     plotMA
 
 ``` r
-glm2 <- glm(loc_rate ~ host_House_finch, data = counts_matrix)
-summary(glm2)
+install.packages("umap")
 ```
 
-    ## 
-    ## Call:
-    ## glm(formula = loc_rate ~ host_House_finch, data = counts_matrix)
-    ## 
-    ## Coefficients:
-    ##                  Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)      0.054861   0.006755   8.122 6.07e-15 ***
-    ## host_House_finch 0.027479   0.006662   4.125 4.54e-05 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## (Dispersion parameter for gaussian family taken to be 0.01689032)
-    ## 
-    ##     Null deviance: 6.8915  on 392  degrees of freedom
-    ## Residual deviance: 6.6041  on 391  degrees of freedom
-    ##   (2 observations deleted due to missingness)
-    ## AIC: -484.56
-    ## 
-    ## Number of Fisher Scoring iterations: 2
+    ## Installing package into '/cloud/lib/x86_64-pc-linux-gnu-library/4.3'
+    ## (as 'lib' is unspecified)
+
+``` r
+library(umap)
+
+# Version info: R 4.2.2, Biobase 2.58.0, GEOquery 2.66.0, limma 3.54.0
+################################################################
+#   Differential expression analysis with limma
+library(GEOquery)
+library(limma)
+library(umap)
+
+# load series and platform data from GEO
+
+gset <- getGEO("GSE15852", GSEMatrix =TRUE, AnnotGPL=TRUE)
+```
+
+    ## Found 1 file(s)
+
+    ## GSE15852_series_matrix.txt.gz
+
+``` r
+if (length(gset) > 1) idx <- grep("GPL96", attr(gset, "names")) else idx <- 1
+gset <- gset[[idx]]
+
+# make proper column names to match toptable 
+fvarLabels(gset) <- make.names(fvarLabels(gset))
+
+# group membership for all samples
+gsms <- paste0("01010101010101010101010101010101010101010101010101",
+               "010101010101010101010101010101010101")
+sml <- strsplit(gsms, split="")[[1]]
+
+# log2 transformation
+ex <- exprs(gset)
+qx <- as.numeric(quantile(ex, c(0., 0.25, 0.5, 0.75, 0.99, 1.0), na.rm=T))
+LogC <- (qx[5] > 100) ||
+  (qx[6]-qx[1] > 50 && qx[2] > 0)
+if (LogC) { ex[which(ex <= 0)] <- NaN
+exprs(gset) <- log2(ex) }
+
+# assign samples to groups and set up design matrix
+gs <- factor(sml)
+groups <- make.names(c("Normal Breast Tissue","Tumor Breast Tissue"))
+levels(gs) <- groups
+gset$group <- gs
+design <- model.matrix(~group + 0, gset)
+colnames(design) <- levels(gs)
+
+gset <- gset[complete.cases(exprs(gset)), ] # skip missing values
+
+fit <- lmFit(gset, design)  # fit linear model
+
+# set up contrasts of interest and recalculate model coefficients
+cts <- paste(groups[1], groups[2], sep="-")
+cont.matrix <- makeContrasts(contrasts=cts, levels=design)
+fit2 <- contrasts.fit(fit, cont.matrix)
+
+# compute statistics and table of top significant genes
+fit2 <- eBayes(fit2, 0.01)
+tT <- topTable(fit2, adjust="fdr", sort.by="B", number=250)
+
+tT <- subset(tT, select=c("ID","adj.P.Val","P.Value","t","B","logFC","Gene.symbol","Gene.title","Gene.ID"))
+
+# Visualize and quality control test results.
+# Build histogram of P-values for all genes. Normal test
+# assumption is that most genes are not differentially expressed.
+tT2 <- topTable(fit2, adjust="fdr", sort.by="B", number=Inf)
+
+# summarize test results as "up", "down" or "not expressed"
+dT <- decideTests(fit2, adjust.method="fdr", p.value=0.05, lfc=0)
+
+# Volcano plot (log P-value vs log fold change)
+colnames(fit2) # list contrast names
+```
+
+    ## [1] "Normal.Breast.Tissue-Tumor.Breast.Tissue"
+
+``` r
+ct <- 1  # choose contrast of interest
+dT <- topTable(fit2, coef = ct, number = Inf, adjust.method = "BH")
+
+# Define thresholds
+logFC_cutoff <- 1
+adjP_cutoff <- 0.05
+
+# Assign colors based on thresholds
+dT$color <- "grey"  # default
+dT$color[dT$logFC >  logFC_cutoff & dT$adj.P.Val < adjP_cutoff] <- "pink"    # upregulated
+dT$color[dT$logFC < -logFC_cutoff & dT$adj.P.Val < adjP_cutoff] <- "purple"   # downregulated
+
+# Clean up the contrast name (remove periods)
+contrast_name <- gsub("\\.", " ", colnames(fit2)[ct])
+contrast_name <- gsub("-", " and ", contrast_name)
+
+knitr::include_graphics("CD24 Cancer v Control.png")
+```
+
+<img src="CD24 Cancer v Control.png" width="1476" />
+
+``` r
+# Draw volcano plot
+with(dT, plot(logFC, -log10(adj.P.Val),
+              pch = 20,
+              col = color,
+              main = paste("Gene Expression from GSE15852:", contrast_name),
+              xlab = "log2 Fold Change",
+              ylab = "-log10 Adjusted P-value"))
+
+# Add legend
+legend("bottomleft",
+       legend = c("Upregulated", "Downregulated", "Not significant"),
+       col = c("pink", "purple", "grey"),
+       pch = 20,
+       bty = "n")
+```
+
+![](Final-Project-weatherspoon_files/figure-gfm/pressure-2.png)<!-- -->
+\# RESULTS The p-value histogram embedded in the code shows that on
+average, there is decreased regulation of CD24 molecules resulting in
+higher levels of expression in cancerous tissue. However, it also
+highlighted that there were some exeptions to this pattern. Further
+analysis was needed to better understand the causes of cancer in each
+sample. The volcano plot highlights each of the 12,413 genes identified
+in the GSE15852 data set. There are over regulation and under regulation
+of different genes which in turn supports the idea that cancer biology
+is complex and often differs case by case.
 
 # DISCUSSION
 
-## Interpretation - fill in analysis
+The goal of this analysis was to determine whether the expression of
+CD24 differs between cancerous and normal breast tissue samples in order
+to gain a better understanding of gene expression and the development of
+cancer. It was previously predicted that the expression levels of CD24
+would be increased in cancerous tissue when compared to noncancerous or
+normal tissue samples. This prediction was made in light of previous
+literature written about molecules with similar roles to CD24 such as
+ICAM-1 (Roland et al., 2007).
 
-Our analysis compared mosquito blood meal sources from WNV-positive and
-WNV-negative trapping locations. We observed that mosquitoes feeding on
-house finches were more frequently associated with WNV-positive pools,
-suggesting this species may serve as an amplifying host in Salt Lake
-City. This aligns with prior studies that identify passerine birds as
-key reservoirs for WNV transmission. However, additional sampling is
-needed to confirm whether finches are the main contributors or if other
-urban species also play significant roles.
+The analysis compared 43 tissue samples collected from cancerous breast
+tissue and normal breast tissue using Bioconductor, limma, and GEOquary
+data bases to determine whether or not the GSE15852 data set shows a
+correlation between the expression of CD24 levels and the development of
+cancerous cells. The Bonferroni multiple test correction was used to
+adjust the P-values to avoid observing false negatives in the data set.
 
-## Interpretation - fill in analysis/plot
-
-The linear model highlights a p value of p \< 0.05 which indicates a
-statistically significant positive corrilation. This means that the
-overall number of house finch blood meals at a specific site increases
-the likelyhood of a positive WNV result. With that being said, house
-finches can be used as a predictor for WNV amplification in and around
-Salt Lake City, Utah.
+When the code was ran, two plots were used to visualize the trends
+observed. When simply discussing the regulation of CD24 production,
+there was a noticeable difference in gene expression between cancerous
+tissue and healthy tissue. However, not all the tissue samples followed
+this pattern. Further analysis was needed to gain a better understanding
+of gene expression of all 12,413 genes observed in the GSE15852 data
+set. This was done by utilizing a volcano plot to gain a better
+understanding of the patterns across all genes. The volcano graph
+highlighted the difference of regulation and expression in many genes.
+This supports what is already known about cancer biology and that it is
+a complex disease that often varies from each individual and possibly
+each cancerous cell.
 
 # CONCLUSION
 
-In summary, this study highlights a possible relationship between
-mosquito feeding patterns and local WNV prevalence in Salt Lake City.
-The findings suggest that common urban bird species, particularly the
-house finch, may contribute to WNV amplification in residential areas.
-Further studies integrating seasonal sampling and larger data sets will
-be important to confirm these trends and inform mosquito control
-strategies.
+Cancer and cancer biology has, and will continue to baffle scientists
+from around the world due to the nature of its complexity. This
+computational analysis aimed to answer whether or not the expression of
+genes that encode for CD24 molecules (C24 genes) vary in cancerous
+breast tissue compared to normal breast tissue? Through R-based
+computational analysis and the limma statistical framework, clear global
+differences in gene expression were identified between the two tissue
+groups. These transcription distinctions reflect the molecular
+complexity of breast cancer and provide a foundation for evaluating the
+role of specific bio-markers such as CD24.
+
+While additional analysis may be needed to confirm the magnitude and
+direction of CD24-related expression changes, the study demonstrates the
+value of computational genomics in exploring cancer biology. By
+leveraging publicly available data sets, researchers can efficiently
+test hypotheses, identify potential bio-markers, and generate insights
+that may contribute to improved diagnostic or therapeutic strategies.
+Overall, this analysis supports the broader understanding that breast
+cancer involves widespread gene expression dysregulation, and CD24
+remains a relevant molecule for continued investigation.
 
 # REFERENCES
 
-1.  Komar N, Langevin S, Hinten S, Nemeth N, Edwards E, Hettler D, Davis
-    B, Bowen R, Bunning M. Experimental infection of North American
-    birds with the New York 1999 strain of West Nile virus. Emerg Infect
-    Dis. 2003 Mar;9(3):311-22. <https://doi.org/10.3201/eid0903.020628>
+American Psychological Association. (2024, May 21). What is a gene? In
+MedlinePlus Genetics. U.S. National Library of Medicine.
+<https://medlineplus.gov/genetics/understanding/basics/gene/>
 
-2.  ChatGPT. OpenAI, version Jan 2025. Used as a reference for functions
-    such as plot() and to correct syntax errors. Accessed 2025-11-04.
+National Cancer Institute. (2021, October 11). What is cancer? In
+Understanding Cancer. U.S. Department of Health and Human Services.
+<https://www.cancer.gov/about-cancer/understanding/what-is-cancer>
 
-3.  Sejvar JJ. West nile virus: an historical overview. Ochsner J. 2003
-    Summer;5(3):6-10. PMID: 21765761; PMCID: PMC3111838.
+OpenAI. (2025). ChatGPT (version 5.1) \[Large language model\].
+<https://chat.openai.com/>
 
-4.  West Nile virus. Cornell Wildlife Health Lab. (2016, December 1).
-    <https://cwhl.vet.cornell.edu/disease/west-nile-virus#>:~:text=The%20first%20cases%20of%20WNV,%2C%20and%20non%2Dhuman%20primates.
+Panagiotou, E., Syrigos, N. K., Charpidou, A., Kotteas, E., & Vathiotis,
+I. A. (2022). CD24: A Novel Target for Cancer Immunotherapy. Journal of
+personalized medicine, 12(8), 1235.
+<https://doi.org/10.3390/jpm12081235>
 
-5.  What is West Nile virus?. Cleveland Clinic. (2025, September 12).
-    <https://my.clevelandclinic.org/health/diseases/10939-west-nile-virus>
+Roland, C. L., Harken, A. H., Sarr, M. G., & Barnett Jr, C. C. (2007).
+ICAM-1 expression determines malignant potential of cancer. Surgery,
+141(6), 705-707.
 
-6.  Centers for Disease Control and Prevention. (2025). Historic Data
-    (1999-2024). Centers for Disease Control and Prevention. <a
-    href="https://www.cdc.gov/west-nile-virus/data-maps/historic-data.html\"
-    class="uri">https://www.cdc.gov/west-nile-virus/data-maps/historic-data.html\</a>
-
-7.  Hofmeister, E. (2025, July 17). Are birds the only species that is
-    susceptible to West Nile virus infection?. USGS.
-    <https://www.usgs.gov/faqs/are-birds-only-species-susceptible-west-nile-virus-infection#>:~:text=Environmental%20Health-,Are%20birds%20the%20only%20species%20that%20is%20susceptible%20to%20West,Learn%20more:%20Vector%2DBorne%20Diseases
+Sorrell, A. D., Espenschied, C. R., Culver, J. O., & Weitzel, J. N.
+(2013). Tumor protein p53 (TP53) testing and Li-Fraumeni syndrome :
+current status of clinical applications and future directions. Molecular
+diagnosis & therapy, 17(1), 31–47.
+<https://doi.org/10.1007/s40291-013-0020-0>
